@@ -77,12 +77,11 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      PORT: ${ORDERS_PORT}
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       KAFKA_ADDR: ${KAFKA_ADDR}
     ports:
-      - "${ORDERS_PORT}:8080"
+      - "8080:8080"
     develop:
       watch:
         - path: ./orders
@@ -100,7 +99,43 @@ services:
     command:
       [
         "-path", "/migrations",
-        "-database", "${DATABASE_URL}",
+        "-database", "${DATABASE_URL}&x-migrations-table=order_migrations",
+        "up"
+      ]
+    restart: "no"
+
+  payment-service:
+    build: ./payment
+    container_name: payment-service
+    depends_on:
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      KAFKA_ADDR: ${KAFKA_ADDR}
+    ports:
+      - "8081:8080"
+    develop:
+      watch:
+        - path: ./payment
+          action: rebuild
+
+  payment-migrations:
+    image: migrate/migrate
+    container_name: payment-migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./payment/migrations:/migrations
+    entrypoint: ["migrate"]
+    command:
+      [
+        "-path", "/migrations",
+        "-database", "${DATABASE_URL}&x-migrations-table=payment_migrations",
         "up"
       ]
     restart: "no"
