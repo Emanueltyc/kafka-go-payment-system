@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func Validator(c *fiber.Ctx) error {
+func JWTValidator(c *fiber.Ctx) error {
 	secret := []byte(os.Getenv("JWT_SECRET"))
 
 	if header := c.Get("Authorization"); strings.HasPrefix(header, "Bearer") {

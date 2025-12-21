@@ -1,6 +1,10 @@
 package dto
 
-import "github.com/shopspring/decimal"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 type PaymentRequest struct {
 	OrderID       string `json:"order_id" validate:"required"`
@@ -19,4 +23,16 @@ type PaymentResponse struct {
 	Amount        decimal.Decimal `json:"amount"`
 	PaymentMethod string          `json:"payment_method"`
 	CreatedAt     string          `json:"created_at"`
+}
+
+type GatewayRequest struct {
+	EventID   string      `json:"event_id"`
+	Data      GatewayData `json:"data"`
+	CreatedAt time.Time   `json:"created_at"`
+}
+
+type GatewayData struct {
+	PaymentID string `json:"payment_id"`
+	Status    string `json:"status"`
+	Reason    string `json:"reason,omitempty"`
 }

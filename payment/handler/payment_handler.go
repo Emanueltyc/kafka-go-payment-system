@@ -19,14 +19,14 @@ func NewPaymentHandler(service *service.PaymentService) *PaymentHandler {
 	}
 }
 
-func (ph *PaymentHandler) Create(c *fiber.Ctx) error {
+func (ph *PaymentHandler) Payment(c *fiber.Ctx) error {
 	var paymentRequest *dto.PaymentRequest
 
 	if err := c.BodyParser(&paymentRequest); err != nil {
 		return err
 	}
 
-	payment, err := ph.service.CreateOrder(c.Context(), paymentRequest)
+	payment, err := ph.service.CreatePayment(c.Context(), paymentRequest)
 	if err != nil {
 		return err
 	}
@@ -44,6 +44,23 @@ func (ph *PaymentHandler) Create(c *fiber.Ctx) error {
 	c.Status(http.StatusCreated).JSON(fiber.Map{
 		"payment": paymentResponse,
 	})
+
+	return nil
+}
+
+func (ph *PaymentHandler) Gateway(c *fiber.Ctx) error {
+	var gatewayRequest *dto.GatewayRequest
+
+	if err := c.BodyParser(&gatewayRequest); err != nil {
+		return err
+	}
+
+	c.Status(http.StatusOK)
+
+	err := ph.service.UpdatePayment(c.Context(), gatewayRequest)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

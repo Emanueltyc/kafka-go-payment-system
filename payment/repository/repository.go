@@ -40,3 +40,19 @@ func (r *Repository) CreatePayment(ctx context.Context, payment *model.Payment) 
 
 	return payment, nil
 }
+
+func (r *Repository) UpdatePayment(ctx context.Context, payment *model.Payment) (*model.Payment, error) {
+	query := `UPDATE payments SET status = @status WHERE ID = @PaymentID RETURNING *`
+
+	args := pgx.NamedArgs{
+		"PaymentID": payment.ID,
+		"status":    payment.Status,
+	}
+
+	err := r.pool.QueryRow(ctx, query, args).Scan(&payment.ID, &payment.OrderID, &payment.UserID, &payment.Status, &payment.Currency, &payment.Amount, &payment.PaymentMethod, &payment.CreatedAt, &payment.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return payment, nil
+}

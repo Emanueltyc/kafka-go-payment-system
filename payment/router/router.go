@@ -7,5 +7,9 @@ import (
 )
 
 func PaymentRouter(r fiber.Router, ph *handler.PaymentHandler) {
-	r.Post("/payment", ph.Create)
+	r.Post("/payment", ph.Payment)
+}
+
+func WebhookRouter(r fiber.Router, ph *handler.PaymentHandler) {
+	r.Post("/payment", ph.Gateway)
 }
