@@ -84,13 +84,28 @@ func (s *PaymentService) UpdatePayment(ctx context.Context, gatewayRequest *dto.
 	status := constants.Status[strings.ToLower(gatewayRequest.Data.Status)]
 	topic := constants.Topics[strings.ToLower(gatewayRequest.Data.Status)]
 
+	processedEvent, err := s.repo.FindProcessedEventByID(ctx, gatewayRequest.EventID)
+	if err != nil {
+		return err
+	}
+
+	if processedEvent != nil {
+		return nil
+	}
+
 	payment := &model.Payment{
 		ID:     paymentID,
 		Status: status,
 	}
 
-	payment, err := s.repo.UpdatePayment(ctx, payment)
+	payment, err = s.repo.UpdatePayment(ctx, payment)
 	if err != nil {
+		return err
+	}
+
+	if err = s.repo.CreateProcessedEvent(ctx, &model.ProcessedEvent{
+		ID: gatewayRequest.EventID,
+	}); err != nil {
 		return err
 	}
 

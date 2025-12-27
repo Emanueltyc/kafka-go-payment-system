@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS payment.processed_events (
+    id CHAR(36) PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);

@@ -21,13 +21,13 @@ import (
 type MockGateway struct{}
 
 func NewMockGateway() MockGateway {
-	return MockGateway{}	
+	return MockGateway{}
 }
 
 type webhookPayload struct {
-	EventID string `json:"event_id"`
-	Data webhookData `json:"data"`
-	CreatedAt time.Time `json:"created_at"`
+	EventID   string      `json:"event_id"`
+	Data      webhookData `json:"data"`
+	CreatedAt time.Time   `json:"created_at"`
 }
 
 type webhookData struct {
@@ -37,7 +37,7 @@ type webhookData struct {
 }
 
 func (m *MockGateway) Charge(ctx context.Context, req *ports.ChargeRequest) (*ports.ChargeResult, error) {
-	go func () {
+	go func() {
 		time.Sleep(500 * time.Millisecond)
 		callWebhook(req)
 	}()
@@ -50,8 +50,8 @@ func (m *MockGateway) Charge(ctx context.Context, req *ports.ChargeRequest) (*po
 
 func callWebhook(req *ports.ChargeRequest) {
 	webhookData := &webhookPayload{
-		EventID: uuid.NewString(),
-		Data: webhookData{},
+		EventID:   uuid.NewString(),
+		Data:      webhookData{},
 		CreatedAt: time.Now(),
 	}
 
@@ -74,7 +74,12 @@ func callWebhook(req *ports.ChargeRequest) {
 	request.Header.Add("content-type", "application/json")
 	request.Header.Add("x-Mock-Signature", generateSignature(marshaledBody, os.Getenv("WEBHOOK_SECRET")))
 
-	client.Do(request)
+	go func() {
+		for range(3) {
+			client.Do(request)
+			time.Sleep(time.Second + 10)
+		}
+	}()
 }
 
 func generateSignature(payload []byte, secret string) string {

@@ -56,3 +56,33 @@ func (r *Repository) UpdatePayment(ctx context.Context, payment *model.Payment) 
 
 	return payment, nil
 }
+
+func (r *Repository) CreateProcessedEvent(ctx context.Context, event *model.ProcessedEvent) error {
+	query := `INSERT INTO processed_events (id) VALUES (@id)`
+
+	if _, err := r.pool.Exec(ctx, query, pgx.NamedArgs{
+		"id": event.ID,
+	}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) FindProcessedEventByID(ctx context.Context, id string) (*model.ProcessedEvent, error) {
+	query := `SELECT * FROM processed_events WHERE id = @id`
+
+	processedEvent := new(model.ProcessedEvent)
+
+	if err := r.pool.QueryRow(ctx, query, pgx.NamedArgs{
+		"id": id,
+	}).Scan(&processedEvent.ID, &processedEvent.CreatedAt); err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+		
+		return nil, err
+	}
+
+	return processedEvent, nil
+}

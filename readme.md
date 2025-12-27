@@ -7,7 +7,7 @@ Database: Postgres 16
   - [ ]  create consumer for payment events
 - [ ]  Payment Service
   - [x]  create gateway mock call
-  - [ ]  guarantee idempotency for gateway handling
+  - [x]  guarantee idempotency for gateway handling
 
 ### Clone the repository
 
