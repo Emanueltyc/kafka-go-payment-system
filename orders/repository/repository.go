@@ -61,3 +61,18 @@ func (r *Repository) CreateItems(ctx context.Context, items []model.OrderItem) e
 	return nil
 }
 
+func (r *Repository) UpdateOrder(ctx context.Context, order *model.Order) (*model.Order, error) {
+	query := `UPDATE orders set status = @status where id = @orderID RETURNING *`
+
+	args := pgx.NamedArgs{
+		"orderID": order.ID,
+		"status":  order.Status,
+	}
+
+	err := r.pool.QueryRow(ctx, query, args).Scan(&order.ID, &order.UserID, &order.Status, &order.Currency, &order.Amount, &order.PaymentMethod, &order.CreatedAt, &order.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	return order, nil
+}

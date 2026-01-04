@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"orders/database"
 	"orders/handler"
@@ -25,6 +26,9 @@ func main() {
 	orderRepo := repository.NewRepository(db)
 	orderService := service.NewOrderService(orderRepo, producer)
 	orderHandler := handler.NewOrderHandler(orderService)
+
+	consumer := streaming.NewConsumer(os.Getenv("KAFKA_ADDR"), orderHandler.HandleMessage)
+	go consumer.Read(context.Background())
 
 	api := app.Group("/api/v1", middleware.Validator)
 

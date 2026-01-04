@@ -1,12 +1,18 @@
 package handler
 
 import (
+	"context"
+	"encoding/json"
 	"net/http"
 	"orders/dto"
+	"orders/event"
+	"orders/model"
 	"orders/service"
+	"orders/status"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/segmentio/kafka-go"
 )
 
 type OrderHandler struct {
@@ -44,6 +50,35 @@ func (oc *OrderHandler) Create(c *fiber.Ctx) error {
 	c.Status(http.StatusCreated).JSON(fiber.Map{
 		"order": orderResponse,
 	})
+
+	return nil
+}
+
+func (oc *OrderHandler) HandleMessage(m kafka.Message) error {
+	var paymentEvent event.PaymentEvent
+
+	if err := json.Unmarshal(m.Value, &paymentEvent); err != nil {
+		return err
+	}
+
+	orderID, _ := strconv.ParseInt(paymentEvent.OrderID, 10, 64)
+
+	var newStatus string
+	switch m.Topic {
+	case "payment.approved":
+		newStatus = status.APPROVED
+	case "payment.rejected":
+		newStatus = status.REJECTED
+	}
+
+	order := &model.Order{
+		ID:     orderID,
+		Status: newStatus,
+	}
+
+	if _, err := oc.service.UpdateOrder(context.Background(), order); err != nil {
+		return err
+	}
 
 	return nil
 }

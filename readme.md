@@ -3,9 +3,9 @@
 Payment system using Go and Kafka (in progress)<br>
 Database: Postgres 16
 
-- [ ]  Order Service
-  - [ ]  create consumer for payment events
-- [ ]  Payment Service
+- [x]  Order Service
+  - [x]  create consumer for payment events
+- [x]  Payment Service
   - [x]  create gateway mock call
   - [x]  guarantee idempotency for gateway handling
 

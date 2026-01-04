@@ -91,3 +91,12 @@ func (s *OrderService) CreateItems(ctx context.Context, items []model.OrderItem)
 
 	return nil
 }
+
+func (s *OrderService) UpdateOrder(ctx context.Context, order *model.Order) (*model.Order, error) {
+	order, err := s.repo.UpdateOrder(ctx, order)
+	if err != nil {
+		return nil, err
+	}
+
+	return order, nil
+}
