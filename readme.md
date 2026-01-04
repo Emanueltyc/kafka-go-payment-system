@@ -3,6 +3,33 @@
 Payment system using Go and Kafka (in progress)<br>
 Database: Postgres 16
 
+```mermaid
+flowchart LR
+FE[Frontend]
+
+ORDER[Order Service]
+PAYMENT[Payment Service]
+
+POSTGRES[(Postgres)]
+
+GATEWAY[Payment Gateway]
+KAFKA[(Kafka)]
+
+FE --> ORDER
+FE --> PAYMENT
+
+ORDER --> POSTGRES
+PAYMENT --> POSTGRES
+
+PAYMENT --> GATEWAY
+GATEWAY --> PAYMENT
+
+ORDER --> KAFKA
+PAYMENT --> KAFKA
+
+KAFKA --> ORDER
+```
+
 - [x]  Order Service
   - [x]  create consumer for payment events
 - [x]  Payment Service
