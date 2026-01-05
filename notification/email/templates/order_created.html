@@ -1,0 +1,35 @@
+{{ define "order_created" }}
+{{ template "base" . }}
+{{ end }}
+
+{{ define "content" }}
+<h2>Order #{{ .OrderID }} created 🛒</h2>
+
+<p>Hello {{ .Username }},</p>
+
+<p>
+    We received your order.
+</p>
+
+<p><strong>Order resume:</strong></p>
+
+{{ $currency := .Currency }}
+
+<ul>
+    {{ range .Items }}
+    <li>
+        {{ .Name }} — {{ .Quantity }}x ({{ $currency }} {{ .Price }})
+    </li>
+    {{ end }}
+</ul>
+
+<p>
+    <strong>Total:</strong> {{ $currency }} {{ .Amount }}
+</p>
+
+<p>
+    We will notify you as soon as your payment is approved.
+</p>
+
+<p>Thank you!</p>
+{{ end }}

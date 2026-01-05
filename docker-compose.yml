@@ -80,6 +80,13 @@ services:
     depends_on:
       - postgres
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   orders-service:
     build: ./orders
     container_name: orders-service
@@ -153,6 +160,24 @@ services:
       ]
     restart: "no"
 
+  notification-service:
+    build: ./notification
+    container_name: notification-service
+    depends_on:
+      mailhog:
+        condition: service_started
+      kafka:
+        condition: service_started
+    environment:
+      KAFKA_ADDR: ${KAFKA_ADDR}
+      SMTP_HOST: "mailhog"
+      SMTP_PORT: "1025"
+    ports:
+      - "8082:8080"
+    develop:
+      watch:
+        - path: ./notification
+          action: rebuild
 volumes:
   postgres_data:
   kafka_data:

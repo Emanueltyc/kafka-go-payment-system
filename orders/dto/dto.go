@@ -3,11 +3,13 @@ package dto
 import "github.com/shopspring/decimal"
 
 type OrderRequest struct {
-	UserID        string             `json:"user_id"`
-	Items         []OrderItemRequest `json:"items"`
-	Currency      string             `json:"currency"`
-	Amount        string             `json:"amount"`
-	PaymentMethod string             `json:"payment_method"`
+	UserID        string             `json:"user_id" validate:"required"`
+	Username      string             `json:"username" validate:"required"`
+	Email         string             `json:"email" validate:"required"`
+	Items         []OrderItemRequest `json:"items" validate:"required"`
+	Currency      string             `json:"currency" validate:"required"`
+	Amount        string             `json:"amount" validate:"required"`
+	PaymentMethod string             `json:"payment_method" validate:"required"`
 }
 
 type OrderItemRequest struct {

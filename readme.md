@@ -9,6 +9,7 @@ FE[Frontend]
 
 ORDER[Order Service]
 PAYMENT[Payment Service]
+NOTIFICATION[Notification Service]
 
 POSTGRES[(Postgres)]
 
@@ -28,6 +29,7 @@ ORDER --> KAFKA
 PAYMENT --> KAFKA
 
 KAFKA --> ORDER
+KAFKA --> NOTIFICATION
 ```
 
 - [x]  Order Service
@@ -35,6 +37,8 @@ KAFKA --> ORDER
 - [x]  Payment Service
   - [x]  create gateway mock call
   - [x]  guarantee idempotency for gateway handling
+- [ ]  Notification service
+  - [ ]  implement email notification for payment events
 
 ### Clone the repository
 

@@ -66,17 +66,30 @@ func (s *OrderService) CreateOrder(ctx context.Context, orderRequest *dto.OrderR
 		return nil, err
 	}
 
-	event := &event.OrderCreated{
-		EventID:   uuid.NewString(),
-		OrderID:   strconv.FormatInt(order.ID, 10),
-		UserID:    strconv.FormatInt(order.UserID, 10),
-		Amount:    order.Amount.String(),
-		Currency:  order.Currency,
+	newEvent := &event.OrderCreated{
+		EventID: uuid.NewString(),
+		Payload: event.OrderPayload{
+			OrderID:  strconv.FormatInt(order.ID, 10),
+			Username: orderRequest.Username,
+			Email:    orderRequest.Email,
+			UserID:   strconv.FormatInt(order.UserID, 10),
+			Amount:   order.Amount.String(),
+			Currency: order.Currency,
+			Items:    []event.OrderItem{},
+		},
 		CreatedAt: time.Now(),
 	}
 
+	for _, i := range items {
+		newEvent.Payload.Items = append(newEvent.Payload.Items, event.OrderItem{
+			Name:     i.ProductName,
+			Price:    i.UnitPrice.String(),
+			Quantity: int(i.Quantity),
+		})
+	}
+
 	go func() {
-		if err := s.producer.Publish(ctx, event); err != nil {
+		if err := s.producer.Publish(ctx, newEvent); err != nil {
 			log.Println(err)
 		}
 	}()
