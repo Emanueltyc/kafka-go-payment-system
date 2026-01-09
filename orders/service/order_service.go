@@ -45,7 +45,7 @@ func (s *OrderService) CreateOrder(ctx context.Context, orderRequest *dto.OrderR
 		return nil, err
 	}
 
-	var items []model.OrderItem
+	items := make([]model.OrderItem, 0, len(orderRequest.Items))
 
 	for _, item := range orderRequest.Items {
 		productID, _ := strconv.ParseInt(item.ProductID, 10, 64)

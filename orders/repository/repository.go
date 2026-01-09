@@ -41,7 +41,7 @@ func (r *Repository) CreateOrder(ctx context.Context, order *model.Order) (*mode
 }
 
 func (r *Repository) CreateItems(ctx context.Context, items []model.OrderItem) error {
-	rows := [][]any{}
+	rows := make([][]any, 0, len(items))
 	for _, item := range items {
 		rows = append(rows, []any{item.OrderID, item.ProductID, item.ProductName, item.UnitPrice, item.Quantity, item.Amount})
 	}
